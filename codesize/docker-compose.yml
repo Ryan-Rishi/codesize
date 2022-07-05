@@ -2,24 +2,63 @@ version: "3"
 
 services:
   influxdb:
-    image: influxdb:2.3.0
-    volumes:
-      - influxdb-storage:/var/lib/influxdb2:rw
-    env_file:
-      - .env
-    entrypoint: ["./entrypoint.sh"]
-    restart: on-failure:10
+    image: influxdb:latest
+    container_name: influxdb
+    restart: always
     ports:
-      - ${DOCKER_INFLUXDB_INIT_PORT}:8086
+      - '8086:8086'
+    volumes:
+      - influxdb-storage:/var/lib/influxdb2
+      - influxdb-config:/etc/influxdb2
+      - /etc/letsencrypt:/etc/letsencrypt
+      - ${PWD}/backup:/backup
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=${INFLUXDB_USER}
+      - DOCKER_INFLUXDB_INIT_PASSWORD=${INFLUXDB_PASSWORD}
+      - DOCKER_INFLUXDB_INIT_ORG=${INFLUXDB_ORG}
+      - DOCKER_INFLUXDB_INIT_BUCKET=${INFLUXDB_BUCKET}
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${INFLUXDB_ADMIN_TOKEN}
+      - INFLUXD_TLS_CERT=/etc/letsencrypt/live/${DASHBOARD_DOMAIN}/fullchain.pem
+      - INFLUXD_TLS_KEY=/etc/letsencrypt/live/${DASHBOARD_DOMAIN}/privkey.pem
 
   grafana:
-    image: grafana/grafana-oss:9.0.1
-    volumes:
-      - grafana-storage:/var/lib/grafana:rw
-    depends_on:
-      - influxdb
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: always
     ports:
-      - ${GRAFANA_PORT}:3000
+      - '443:443'
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - /etc/letsencrypt:/etc/letsencrypt
+      - ${PWD}/backup:/backup
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+      - GF_SERVER_PROTOCOL=https
+      - GF_SERVER_HTTP_PORT=443
+      - GF_SERVER_DOMAIN=${DASHBOARD_DOMAIN}
+      - GF_SERVER_CERT_FILE=/etc/letsencrypt/live/${DASHBOARD_DOMAIN}/fullchain.pem
+      - GF_SERVER_CERT_KEY=/etc/letsencrypt/live/${DASHBOARD_DOMAIN}/privkey.pem
+
+   nginx:
+    image: nginx:1.15-alpine
+    restart: unless-stopped
+    volumes:
+      - ./data/nginx:/etc/nginx/conf.d
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    ports:
+      - "80:80"
+      - "443:443"
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+  certbot:
+    image: certbot/certbot
+    restart: unless-stopped
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
 volumes:
   grafana-storage:
