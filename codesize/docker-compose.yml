@@ -1,6 +1,34 @@
 version: '3'
 
 services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    container_name: nginx
+    restart: always
+    labels:
+      - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy
+    ports:
+      - 80
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./nginx/html:/usr/share/nginx/html
+      - ./nginx/vhost.d:/etc/nginx/vhost.d
+      - ./letsencrypt/certs:/etc/nginx/certs:ro
+
+  letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    container_name: letsencrypt
+    restart: always
+    environment:
+      - NGINX_PROXY_CONTAINER=nginx-proxy
+      - REUSE_PRIVATE_KEYS=true
+    volumes_from:
+      - nginx-proxy
+    volumes:
+      - ./letsencrypt/certs:/etc/nginx/certs:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+  
   influxdb:
     container_name: influxdb
     image: influxdb:latest
@@ -35,33 +63,6 @@ services:
       - ./letsencrypt/certs:/etc/letsencrypt/certs:ro
       - grafana-data:/var/lib/grafana
 
-  nginx-proxy:
-    image: jwilder/nginx-proxy
-    container_name: nginx
-    restart: always
-    labels:
-      - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy
-    ports:
-      - 80
-      - "443:443"
-    volumes:
-      - /var/run/docker.sock:/tmp/docker.sock:ro
-      - ./nginx/html:/usr/share/nginx/html
-      - ./nginx/vhost.d:/etc/nginx/vhost.d
-      - ./letsencrypt/certs:/etc/nginx/certs:ro
-
-  letsencrypt:
-    image: jrcs/letsencrypt-nginx-proxy-companion
-    container_name: letsencrypt
-    restart: always
-    environment:
-      - NGINX_PROXY_CONTAINER=nginx-proxy
-      - REUSE_PRIVATE_KEYS=true
-    volumes_from:
-      - nginx-proxy
-    volumes:
-      - ./letsencrypt/certs:/etc/nginx/certs:rw
-      - /var/run/docker.sock:/var/run/docker.sock:ro
 
 volumes:
   grafana-data:
