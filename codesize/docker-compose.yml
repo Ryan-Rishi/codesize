@@ -1,56 +1,70 @@
-version: "3"
+version: '3'
 
 services:
   influxdb:
-    image: influxdb:latest
     container_name: influxdb
+    image: influxdb:latest
     restart: always
     ports:
       - 8086
     volumes:
-      - influxdb-storage:/var/lib/influxdb2
-      - influxdb-config:/etc/influxdb2
-      - /etc/letsencrypt:/etc/letsencrypt
+      - './data:/root/.influxdbv2'
+      - ./letsencrypt/certs:/etc/letsencrypt/certs:ro
     environment:
-      - DOCKER_INFLUXDB_INIT_MODE=setup
-      - DOCKER_INFLUXDB_INIT_USERNAME=silveradmin
-      - DOCKER_INFLUXDB_INIT_PASSWORD=silveradmin123
-      - DOCKER_INFLUXDB_INIT_ORG=silvertree
-      - DOCKER_INFLUXDB_INIT_BUCKET=firmware_size
-      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=1bbffa6e9788bfe6499230d4a0dc27061dae904c310f0cb81e20dbbb120329d5
-      - INFLUXD_TLS_CERT=/etc/letsencrypt/live/metrics.silvertree.io/fullchain.pem
-      - INFLUXD_TLS_KEY=/etc/letsencrypt/live/metrics.silvertree.io/privkey.pem
+      - INFLUXD_TLS_CERT=/etc/letsencrypt/certs/metrics.silvertreelabs.io.crt # adjust to match your domain name
+      - INFLUXD_TLS_KEY=/etc/letsencrypt/certs/metrics.silvertreelabs.io.key # adjust to match your domain name
+
 
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana
     container_name: grafana
     restart: always
+    environment:
+      - VIRTUAL_HOST=metrics.silvertreelabs.io # adjust to match your domain name
+      - VIRTUAL_PROTO=https
+      - VIRTUAL_PORT=3000
+      - LETSENCRYPT_HOST=metrics.silvertreelabs.io # adjust to match your domain name
+      - LETSENCRYPT_EMAIL=rrishi2024@yahoo.com # adjust to match your email
+
+      - GF_SERVER_CERT_FILE=/etc/letsencrypt/certs/metrics.silvertreelabs.io.crt # adjust to match your domain name
+      - GF_SERVER_CERT_KEY=/etc/letsencrypt/certs/metrics.silvertreelabs.io.key # adjust to match your domain name
+      - GF_SERVER_PROTOCOL=https
+
+      - GF_SERVER_DOMAIN=metrics.silvertreelabs.io # adjust to match your domain name
+      - GF_SECURITY_ADMIN_USER=silvertreeadmin # adjust to create Grafana admin account
+      - GF_SECURITY_ADMIN_PASSWORD=silvertreepassword123 # adjust to set Grafana admin password
+    volumes:
+      - ./letsencrypt/certs:/etc/letsencrypt/certs:ro
+      - grafana-data:/var/lib/grafana
+
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    container_name: nginx
+    restart: always
+    labels:
+      - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy
     ports:
+      - 80
       - 443
     volumes:
-      - grafana-storage:/var/lib/grafana
-      - /etc/letsencrypt:/etc/letsencrypt
-    environment:
-      - GF_SECURITY_ADMIN_USER=silveradmin
-      - GF_SECURITY_ADMIN_PASSWORD=silveradmin123
-      - GF_SERVER_PROTOCOL=https
-      - GF_SERVER_HTTP_PORT=443
-      - GF_SERVER_DOMAIN=metrics.silvertree.io
-      - GF_SERVER_CERT_FILE=/etc/letsencrypt/live/metrics.silvertree.io/fullchain.pem
-      - GF_SERVER_CERT_KEY=/etc/letsencrypt/live/metrics.silvertree.io/privkey.pem
-      
-  certbot:
-    image: certbot/certbot
-    restart: unless-stopped
-    volumes:
-      - ./data/certbot/conf:/etc/letsencrypt
-      - ./data/certbot/www:/var/www/certbot
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
-    
-volumes:
-  grafana-storage:
-  influxdb-storage:
-  influxdb-config:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./nginx/html:/usr/share/nginx/html
+      - ./nginx/vhost.d:/etc/nginx/vhost.d
+      - ./letsencrypt/certs:/etc/nginx/certs:ro
+
   letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    container_name: letsencrypt
+    restart: always
+    environment:
+      - NGINX_PROXY_CONTAINER=nginx-proxy
+      - REUSE_PRIVATE_KEYS=true
+    volumes_from:
+      - nginx-proxy
+    volumes:
+      - ./letsencrypt/certs:/etc/nginx/certs:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro
 
-
+volumes:
+  grafana-data:
+    driver: local
