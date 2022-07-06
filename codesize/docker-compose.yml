@@ -39,7 +39,7 @@ services:
       - GF_SERVER_CERT_FILE=/etc/letsencrypt/live/${DASHBOARD_DOMAIN}/fullchain.pem
       - GF_SERVER_CERT_KEY=/etc/letsencrypt/live/${DASHBOARD_DOMAIN}/privkey.pem
 
-   nginx:
+  nginx:
     image: nginx:1.15-alpine
     restart: unless-stopped
     volumes:
