@@ -6,7 +6,7 @@ services:
     image: influxdb:latest
     restart: always
     ports:
-      - 8086
+      - '8086:8086'
     volumes:
       - './data:/root/.influxdbv2'
       - ./letsencrypt/certs:/etc/letsencrypt/certs:ro
@@ -44,8 +44,8 @@ services:
     labels:
       - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy
     ports:
-      - 80
-      - 443
+      - "80:80"
+      - "443:443"
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - ./nginx/html:/usr/share/nginx/html
