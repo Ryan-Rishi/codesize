@@ -61,3 +61,5 @@ services:
 volumes:
   grafana-storage:
   influxdb-storage:
+  influxdb-config:
+  letsencrypt:
