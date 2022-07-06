@@ -1,33 +1,32 @@
 version: '3'
 
 services:
-  nginx-proxy:
-    image: jwilder/nginx-proxy
+  nginx:
+    image: jwilder/nginx-proxy:0.6.0
     container_name: nginx
     restart: always
     labels:
       - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy
     ports:
-      - 80
+      - "80:80"
       - "443:443"
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - ./nginx/html:/usr/share/nginx/html
       - ./nginx/vhost.d:/etc/nginx/vhost.d
       - ./letsencrypt/certs:/etc/nginx/certs:ro
-
   letsencrypt:
-    image: jrcs/letsencrypt-nginx-proxy-companion
+    image: jrcs/letsencrypt-nginx-proxy-companion:v1.7
     container_name: letsencrypt
     restart: always
-    environment:
-      - NGINX_PROXY_CONTAINER=nginx-proxy
-      - REUSE_PRIVATE_KEYS=true
     volumes_from:
-      - nginx-proxy
+      - nginx
     volumes:
       - ./letsencrypt/certs:/etc/nginx/certs:rw
       - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - REUSE_PRIVATE_KEYS=true
+
   
   influxdb:
     container_name: influxdb
@@ -65,5 +64,7 @@ services:
 
 
 volumes:
+  influx-data:
+    driver: local
   grafana-data:
     driver: local
