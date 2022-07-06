@@ -10,8 +10,8 @@ services:
       - './data:/root/.influxdbv2'
       - ./letsencrypt/certs:/etc/letsencrypt/certs:ro
     environment:
-      - INFLUXD_TLS_CERT=/etc/letsencrypt/certs/metrics.silvertreelabs.io.crt # adjust to match your domain name
-      - INFLUXD_TLS_KEY=/etc/letsencrypt/certs/metrics.silvertreelabs.io.key # adjust to match your domain name
+      - INFLUXD_TLS_CERT=/letsencrypt/certs/metrics.silvertreelabs.io.crt # adjust to match your domain name
+      - INFLUXD_TLS_KEY=/letsencrypt/certs/metrics.silvertreelabs.io.key # adjust to match your domain name
 
 
   grafana:
@@ -24,8 +24,8 @@ services:
       - LETSENCRYPT_HOST=metrics.silvertreelabs.io # adjust to match your domain name
       - LETSENCRYPT_EMAIL=rrishi2024@yahoo.com # adjust to match your email
 
-      - GF_SERVER_CERT_FILE=/etc/letsencrypt/certs/metrics.silvertreelabs.io.crt # adjust to match your domain name
-      - GF_SERVER_CERT_KEY=/etc/letsencrypt/certs/metrics.silvertreelabs.io.key # adjust to match your domain name
+      - GF_SERVER_CERT_FILE=/letsencrypt/certs/metrics.silvertreelabs.io.crt # adjust to match your domain name
+      - GF_SERVER_CERT_KEY=/letsencrypt/certs/metrics.silvertreelabs.io.key # adjust to match your domain name
       - GF_SERVER_PROTOCOL=https
 
       - GF_SERVER_DOMAIN=metrics.silvertreelabs.io # adjust to match your domain name
