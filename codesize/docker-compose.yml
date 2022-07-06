@@ -1,4 +1,4 @@
-version: "3.3"
+version: "3"
 
 services:
   grafana:
@@ -50,26 +50,26 @@ services:
       - traefik-data:/letsencrypt/
       - /var/run/docker.sock:/var/run/docker.sock
 
-influx:
-  image: influxdb:1.7 # or any other recent version
-  labels:
-    # SSL endpoint
-    - "traefik.http.routers.some-name-influx-ssl.entryPoints=port8086"
-    - "traefik.http.routers.some-name-influx-ssl.rule=host('metrics.silvertreelabs.io')"
-    - "traefik.http.routers.some-name-influx-ssl.tls=true"
-    - "traefik.http.routers.some-name-influx-ssl.tls.certResolver=le-ssl"
-    - "traefik.http.routers.some-name-influx-ssl.service=some-name-influx-ssl"
-    - "traefik.http.services.some-name-influx-ssl.loadBalancer.server.port=8086"
-  restart: always
-  volumes:
-    - influx-data:/var/lib/influxdb
-  environment:
-    - INFLUXDB_DB=firmware_size # set any other to create database on initialization
-    - INFLUXDB_HTTP_ENABLED=true
-    - INFLUXDB_HTTP_AUTH_ENABLED=true
+  influx:
+    image: influxdb:1.7 # or any other recent version
+    labels:
+      # SSL endpoint
+      - "traefik.http.routers.some-name-influx-ssl.entryPoints=port8086"
+      - "traefik.http.routers.some-name-influx-ssl.rule=host('metrics.silvertreelabs.io')"
+      - "traefik.http.routers.some-name-influx-ssl.tls=true"
+      - "traefik.http.routers.some-name-influx-ssl.tls.certResolver=le-ssl"
+      - "traefik.http.routers.some-name-influx-ssl.service=some-name-influx-ssl"
+      - "traefik.http.services.some-name-influx-ssl.loadBalancer.server.port=8086"
+    restart: always
+    volumes:
+      - influx-data:/var/lib/influxdb
+    environment:
+      - INFLUXDB_DB=firmware_size # set any other to create database on initialization
+      - INFLUXDB_HTTP_ENABLED=true
+      - INFLUXDB_HTTP_AUTH_ENABLED=true
 
-    - INFLUXDB_ADMIN_USER=Silvertreeadmin
-    - INFLUXDB_ADMIN_PASSWORD=Rooster123
+      - INFLUXDB_ADMIN_USER=Silvertreeadmin
+      - INFLUXDB_ADMIN_PASSWORD=Rooster123
 
 
 volumes:
