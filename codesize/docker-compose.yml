@@ -26,7 +26,7 @@ services:
     container_name: grafana
     restart: always
     ports:
-      - '3000:3000'
+      - '443'
     volumes:
       - grafana-storage:/var/lib/grafana
       - /etc/letsencrypt:/etc/letsencrypt
