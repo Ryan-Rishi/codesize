@@ -37,7 +37,7 @@ services:
       # expose port below only if you need access to the Traefik API
       #- "8080:8080"
     command:
-      #- "--log.level=DEBUG"
+      - "--log.level=DEBUG"
       #- "--api=true"
       - "--providers.docker=true"
 
@@ -57,12 +57,12 @@ services:
     image: influxdb:latest # or any other recent version
     labels:
       # SSL endpoint
-      - "traefik.http.routers.some-name-influx-ssl.entryPoints=port8086"
-      - "traefik.http.routers.some-name-influx-ssl.rule=host('metrics.silvertreelabs.io')"
-      - "traefik.http.routers.some-name-influx-ssl.tls=true"
-      - "traefik.http.routers.some-name-influx-ssl.tls.certResolver=le-ssl"
-      - "traefik.http.routers.some-name-influx-ssl.service=some-name-influx-ssl"
-      - "traefik.http.services.some-name-influx-ssl.loadBalancer.server.port=8086"
+      - "traefik.http.routers.db-influx-ssl.entryPoints=port8086"
+      - "traefik.http.routers.db-influx-ssl.rule=host('metrics.silvertreelabs.io')"
+      - "traefik.http.routers.db-influx-ssl.tls=true"
+      - "traefik.http.routers.db-influx-ssl.tls.certResolver=le-ssl"
+      - "traefik.http.routers.db-influx-ssl.service=some-name-influx-ssl"
+      - "traefik.http.services.db-influx-ssl.loadBalancer.server.port=8086"
     restart: always
     volumes:
       - influx-data:/var/lib/influxdb
