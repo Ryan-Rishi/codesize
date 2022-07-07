@@ -6,7 +6,7 @@ services:
     labels:
       # SSL redirect requires a separate router (https://github.com/containous/traefik/issues/4688#issuecomment-477800500)
       - "traefik.http.routers.some-name.entryPoints=port80"
-      - "traefik.http.routers..rule=host('metrics.silvertree.io')"
+      - "traefik.http.routers.some-name.rule=host('metrics.silvertree.io')"
       - "traefik.http.middlewares.some-name-redirect.redirectScheme.scheme=https"
       - "traefik.http.middlewares.some-name-redirect.redirectScheme.permanent=true"
       - "traefik.http.routers.some-name.middlewares=some-name-redirect"
