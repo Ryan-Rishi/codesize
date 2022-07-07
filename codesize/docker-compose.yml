@@ -2,6 +2,7 @@ version: "3"
 
 services:
   grafana:
+    container_name: grafana
     labels:
       # SSL redirect requires a separate router (https://github.com/containous/traefik/issues/4688#issuecomment-477800500)
       - "traefik.http.routers.some-name.entryPoints=port80"
@@ -27,6 +28,7 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=Maverick123
 
   traefik:
+    container_name: traefik
     image: traefik:v2.8.0
     ports:
       - "80:80"
@@ -51,6 +53,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 
   influx:
+    container_name: influxdb
     image: influxdb:latest # or any other recent version
     labels:
       # SSL endpoint
@@ -64,13 +67,14 @@ services:
     volumes:
       - influx-data:/var/lib/influxdb
     environment:
-      - INFLUXDB_DB=firmware_size # set any other to create database on initialization
+      - DOCKER_INFLUXDB_INIT_MODE=setup
       - INFLUXDB_HTTP_ENABLED=true
       - INFLUXDB_HTTP_AUTH_ENABLED=true
-
-      - INFLUXDB_ADMIN_USER=Silvertreeadmin
-      - INFLUXDB_ADMIN_PASSWORD=Rooster123
-
+      - DOCKER_INFLUXDB_INIT_USERNAME=Silvertreeadmin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=Rooster123
+      - DOCKER_INFLUXDB_INIT_ORG=Silvertree
+      - DOCKER_INFLUXDB_INIT_BUCKET=firmware_size
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=1bbffa6e9788bfe6499230d4a0dc27061dae904c310f0cb81e20dbbb120329d5
 
 volumes:
   traefik-data:
