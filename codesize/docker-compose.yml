@@ -60,7 +60,7 @@ services:
       - "traefik.http.routers.db-influx-ssl.entryPoints=port8086"
       - "traefik.http.routers.db-influx-ssl.rule=host('metrics.silvertreelabs.io')"
       - "traefik.http.routers.db-influx-ssl.tls=true"
-      - "traefik.http.routers.db-influx-ssl.tls.certResolver=data-ssl"
+      - "traefik.http.routers.db-influx-ssl.tls.certResolver=le-ssl"
       - "traefik.http.routers.db-influx-ssl.service=db-influx-ssl"
       - "traefik.http.services.db-influx-ssl.loadBalancer.server.port=8086"
     restart: always
