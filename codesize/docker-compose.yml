@@ -37,7 +37,7 @@ services:
       # expose port below only if you need access to the Traefik API
       #- "8080:8080"
     command:
-      - "--log.level=DEBUG"
+      #- "--log.level=DEBUG"
       #- "--api=true"
       - "--providers.docker=true"
 
