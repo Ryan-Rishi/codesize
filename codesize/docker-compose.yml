@@ -5,7 +5,7 @@ services:
     labels:
       # SSL redirect requires a separate router (https://github.com/containous/traefik/issues/4688#issuecomment-477800500)
       - "traefik.http.routers.some-name.entryPoints=port80"
-      - "traefik.http.routers.some-name.rule=host('metrics.silvertree.io')"
+      - "traefik.http.routers..rule=host('metrics.silvertree.io')"
       - "traefik.http.middlewares.some-name-redirect.redirectScheme.scheme=https"
       - "traefik.http.middlewares.some-name-redirect.redirectScheme.permanent=true"
       - "traefik.http.routers.some-name.middlewares=some-name-redirect"
@@ -16,7 +16,7 @@ services:
       - "traefik.http.routers.some-name-ssl.tls.certResolver=le-ssl"
       - "traefik.http.routers.some-name-ssl.service=some-name-ssl"
       - "traefik.http.services.some-name-ssl.loadBalancer.server.port=3000"
-    image: grafana/grafana:6.3.2 # or probably any other version
+    image: grafana/grafana-enterprise:latest # or probably any other version
     volumes:
       - grafana-data:/var/lib/grafana
     environment:
@@ -27,7 +27,7 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=Maverick123
 
   traefik:
-    image: traefik:v2.0.0-beta1
+    image: traefik:v2.8.0
     ports:
       - "80:80"
       - "443:443"
@@ -51,7 +51,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 
   influx:
-    image: influxdb:1.7 # or any other recent version
+    image: influxdb:latest # or any other recent version
     labels:
       # SSL endpoint
       - "traefik.http.routers.some-name-influx-ssl.entryPoints=port8086"
