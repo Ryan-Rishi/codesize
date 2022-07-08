@@ -2,7 +2,7 @@ version: "3"
 
 services:
   grafana:
-    container_name: grafana
+    container_name: grafana-dashboard
     labels:
       # SSL redirect requires a separate router (https://github.com/containous/traefik/issues/4688#issuecomment-477800500)
       - "traefik.http.routers.some-name.entryPoints=port80"
