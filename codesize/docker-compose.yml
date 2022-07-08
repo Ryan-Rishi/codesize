@@ -2,7 +2,7 @@ version: "3"
 
 services:
   grafana:
-    container_name: grafana-dashboard
+    container_name: grafana-dash
     labels:
       # SSL redirect requires a separate router (https://github.com/containous/traefik/issues/4688#issuecomment-477800500)
       - "traefik.http.routers.some-name.entryPoints=port80"
@@ -17,10 +17,12 @@ services:
       - "traefik.http.routers.some-name-ssl.tls.certResolver=le-ssl"
       - "traefik.http.routers.some-name-ssl.service=some-name-ssl"
       - "traefik.http.services.some-name-ssl.loadBalancer.server.port=3000"
-    image: grafana/grafana-enterprise:latest # or probably any other version
+    image: grafana/grafana-enterprise:9.0.0 # or probably any other version
     volumes:
       - grafana-data:/var/lib/grafana
     environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_SERVER_ROOT_URL=https://metrics.silvertree.io
       - GF_SERVER_DOMAIN=metrics.silvertreelabs.io
       - GF_USERS_ALLOW_SIGN_UP=false
