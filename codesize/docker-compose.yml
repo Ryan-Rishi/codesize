@@ -17,7 +17,7 @@ services:
       - "traefik.http.routers.some-name-ssl.tls.certResolver=le-ssl"
       - "traefik.http.routers.some-name-ssl.service=some-name-ssl"
       - "traefik.http.services.some-name-ssl.loadBalancer.server.port=3000"
-    image: grafana/grafana-enterprise:latest # or probably any other version
+    image: grafana/grafana-oss:latest # or probably any other version
     volumes:
       - grafana-data:/var/lib/grafana
     environment:
