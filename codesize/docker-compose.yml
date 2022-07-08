@@ -24,8 +24,8 @@ services:
       - GF_SERVER_ROOT_URL=https://metrics.silvertree.io
       - GF_SERVER_DOMAIN=metrics.silvertreelabs.io
       - GF_USERS_ALLOW_SIGN_UP=false
-      - GF_SECURITY_ADMIN_USER=Silvertreeadmin
-      - GF_SECURITY_ADMIN_PASSWORD=Maverick123
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
 
   traefik:
     container_name: traefik
