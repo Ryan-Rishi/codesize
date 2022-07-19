@@ -6,13 +6,13 @@ services:
     labels:
       # SSL redirect requires a separate router (https://github.com/containous/traefik/issues/4688#issuecomment-477800500)
       - "traefik.http.routers.some-name.entryPoints=port80"
-      - "traefik.http.routers.some-name.rule=host(`44.209.76.42`)"
+      - "traefik.http.routers.some-name.rule=host(`metrics.silvertreelabs.io`)"
       - "traefik.http.middlewares.some-name-redirect.redirectScheme.scheme=https"
       - "traefik.http.middlewares.some-name-redirect.redirectScheme.permanent=true"
       - "traefik.http.routers.some-name.middlewares=some-name-redirect"
       # SSL endpoint
       - "traefik.http.routers.some-name-ssl.entryPoints=port443"
-      - "traefik.http.routers.some-name-ssl.rule=host(`44.209.76.42`)"
+      - "traefik.http.routers.some-name-ssl.rule=host(`metrics.silvertreelabs.io`)"
       - "traefik.http.routers.some-name-ssl.tls=true"
       - "traefik.http.routers.some-name-ssl.tls.certResolver=le-ssl"
       - "traefik.http.routers.some-name-ssl.service=some-name-ssl"
@@ -23,8 +23,8 @@ services:
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
-      - GF_SERVER_ROOT_URL=https://44.209.76.42
-      - GF_SERVER_DOMAIN=44.209.76.42
+      - GF_SERVER_ROOT_URL=https://metrics.silvertreelabs.io
+      - GF_SERVER_DOMAIN=metrics.silvertreelabs.io
       - GF_USERS_ALLOW_SIGN_UP=true
   traefik:
     container_name: traefik
@@ -57,7 +57,7 @@ services:
     labels:
       # SSL endpoint
       - "traefik.http.routers.some-name-influx-ssl.entryPoints=port8086"
-      - "traefik.http.routers.some-name-influx-ssl.rule=host(`44.209.76.42`)"
+      - "traefik.http.routers.some-name-influx-ssl.rule=host(`metrics.silvertreelabs.io`)"
       - "traefik.http.routers.some-name-influx-ssl.tls=true"
       - "traefik.http.routers.some-name-influx-ssl.tls.certResolver=le-ssl"
       - "traefik.http.routers.some-name-influx-ssl.service=some-name-influx-ssl"
